@@ -18,7 +18,7 @@ int main() {
   allocate(sendbuf, numbytes * numproc);
   allocate(recvbuf, numbytes * numproc);
 
-  Comm<int> test1(MPI);
+  Comm<int> test1(library::MPI);
   for(int sender = 0; sender < numproc; sender++){
      for(int recver = 0; recver < numproc; recver++){
   	test1.add(sendbuf, 0, recvbuf, sender * numbytes, numbytes, sender, recver);
