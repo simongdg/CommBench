@@ -80,7 +80,7 @@ elseif (USE_HIP)
                 set_property(TARGET CommFunctions PROPERTY HIP_ARCHITECTURES CMAKE_HIP_PLATFORM)
         else()
                 message(WARNING "CMAKE_HIP_PLATFORM is not defined. Defaulting to gfx942;gfx90A")
-                set_property(TARGET CommFunctions PROPERTY HIP_ARCHITECTURES "gfx942;gfxX90A")
+                set_property(TARGET CommFunctions PROPERTY HIP_ARCHITECTURES "gfx942;gfx90A")
         endif()
     endif()
 
