@@ -63,9 +63,7 @@ if (USE_CUDA)
     find_package(CUDA REQUIRED)
     enable_language(CUDA)
 
-    # Option for specifying CUDA architecture
-    # set(CUDA_ARCHITECTURE "80" CACHE STRING "Specify the CUDA architecture (e.g., 80 meaning arch=compute_80,code=sm_80)")
-    set(CMAKE_CUDA_ARCHITECTURES "80")
+    set(CUDA_ARCHITECTURE "80" CACHE STRING "Specify the CUDA architecture (e.g., 80 for compute_80/sm_80)")
     # target_compile_options(commbench_compiler_flags INTERFACE "-ccbin=mpicxx")
 elseif (USE_HIP)
     find_package(HIP REQUIRED)
