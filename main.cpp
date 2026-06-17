@@ -54,10 +54,36 @@ template <typename... Args> void WARNING(const char *fmt, Args... args) {
   }
 }
 
+static void printUsage(const char *prog) {
+  fprintf(stdout,
+    "Usage: mpirun -n <nranks> %s [OPTIONS]\n"
+    "\n"
+    "Options:\n"
+    "  --use <library>      Communication library (default: mpi)\n"
+    "                         mpi       MPI point-to-point\n"
+    "                         ipc_put   GPU IPC put  (requires CUDA/HIP/OneAPI build)\n"
+    "                         ipc_get   GPU IPC get  (requires CUDA/HIP/OneAPI build)\n"
+    "                         xccl      NCCL/RCCL    (requires -DUSE_XCCL=ON)\n"
+    "  --pattern <p> [...]  Communication pattern(s), space-separated (default: p2p)\n"
+    "                         p2p  broadcast  gather  scatter\n"
+    "                         alltoall  allgather  rail\n"
+    "                         asymmetric_fill  symmetric_fill\n"
+    "  --nbytes <n>         Message size in bytes (default: 100000000)\n"
+    "  --validate           Check correctness instead of benchmarking\n"
+    "  --file <path>        JSON config file (requires -DUSE_JSONCPP=ON)\n"
+    "  --help               Show this message\n"
+    "\n"
+    "Examples:\n"
+    "  mpirun -n 8 %s\n"
+    "  mpirun -n 8 %s --use xccl --pattern rail --nbytes 16777216\n"
+    "  mpirun -n 8 %s --use mpi --pattern gather scatter --validate\n",
+    prog, prog, prog, prog);
+}
+
 std::unordered_map<std::string, std::vector<std::string>>
 parseArgs(int argc, char *argv[]) {
-  static const std::array<std::string, 5> valid_args = {
-      "use", "pattern", "validate", "nbytes", "file"};
+  static const std::array<std::string, 6> valid_args = {
+      "use", "pattern", "validate", "nbytes", "file", "help"};
   int i = 1;
   std::unordered_map<std::string, std::vector<std::string>> args;
   std::string prev = "";
@@ -172,6 +198,15 @@ int main(int argc, char *argv[]) {
 
   int numproc = CommBench::numproc;
   myid_loc = CommBench::myid;
+
+  for (int i = 1; i < argc; i++) {
+    if (std::string(argv[i]) == "--help" || std::string(argv[i]) == "-h") {
+      if (myid_loc == printid)
+        printUsage(argv[0]);
+      MPI_Finalize();
+      return 0;
+    }
+  }
 
   std::unordered_map<std::string, std::vector<std::string>> args =
       parseArgs(argc, argv);
